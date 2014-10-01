@@ -853,7 +853,7 @@ The RTE corpus also supports an ``xml()`` method which produces ElementTrees.
     "Mrs. Bush's approval ratings have remained very high, above 80%,
     even as her husband's have recently dropped below 50%."
 
-verbnet
+VerbNet
 -------
 The VerbNet corpus is a lexicon that divides verbs into classes, based
 on their syntax-semantics linking behavior.  The basic elements in the
@@ -888,9 +888,9 @@ The `vnclass()` method also accepts "short" identifiers, such as '10.1':
     >>> verbnet.vnclass('10.1') # doctest: +ELLIPSIS
     <Element 'VNCLASS' at ...>
 
-See the Verbnet documentation, or the Verbnet files, for information
+See the VerbNet documentation, or the VerbNet files, for information
 about the structure of this xml.  As an example, we can retrieve a
-list of thematic roles for a given Verbnet class:
+list of thematic roles for a given VerbNet class:
 
     >>> vn_31_2 = verbnet.vnclass('admire-31.2')
     >>> for themrole in vn_31_2.findall('THEMROLES/THEMROLE'):
@@ -902,7 +902,7 @@ list of thematic roles for a given Verbnet class:
     Experiencer [+animate]
     Predicate
 
-The Verbnet corpus also provides a variety of pretty printing
+The VerbNet corpus also provides a variety of pretty printing
 functions that can be used to display the xml contents in a more
 consise form.  The simplest such method is `pprint()`:
 
@@ -1626,7 +1626,7 @@ The Brown Corpus uses the tagged corpus reader:
     >>> brown.tagged_paras() # doctest: +ELLIPSIS
     [[[('The', 'AT'), ...]], [[('The', 'AT'), ...]], ...]
 
-Verbnet Corpus Reader
+VerbNet Corpus Reader
 =====================
 
 Make sure we're picking up the right number of elements:
@@ -1659,7 +1659,7 @@ vnclass() accepts filenames, long ids, and short ids:
     >>> a == b == c
     True
 
-fileids() can be used to get files based on verbnet class ids:
+fileids() can be used to get files based on VerbNet class ids:
 
     >>> verbnet.fileids('admire-31.2')
     ['admire-31.2.xml']
