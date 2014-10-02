@@ -1,23 +1,35 @@
 .. Copyright (C) 2001-2014 NLTK Project
 .. For license information, see LICENSE.TXT
 
-VerbNet
--------
+=================
+VerbNet Interface
+=================
+
 The VerbNet corpus is a lexicon that divides verbs into classes, based
-on their syntax-semantics linking behavior.  The basic elements in the
-lexicon are verb lemmas, such as 'abandon' and 'accept', and verb
-classes, which have identifiers such as 'remove-10.1' and
-'admire-31.2-1'.  These class identifiers consist of a representitive
-verb selected from the class, followed by a numerical identifier.  The
-list of verb lemmas, and the list of class identifiers, can be
-retrieved with the following methods:
+on their syntax-semantics linking behavior.
 
     >>> from nltk.corpus import verbnet
+
+------
+Lemmas
+------
+
+The basic elements in the lexicon are verb lemmas, such as 'abandon'
+and 'accept', and verb classes, which have identifiers such as
+'remove-10.1' and 'admire-31.2-1'.  These class identifiers consist of
+a representative verb selected from the class, followed by a numerical
+identifier.  The list of verb lemmas, and the list of class
+identifiers, can be retrieved with the following methods:
+
     >>> verbnet.lemmas()[20:25]
     ['abut', 'accede', 'accelerate', 'accept', 'acclaim']
     >>> verbnet.classids()[:5]
     ['accept-77', 'accompany-51.7', 'acquiesce-95', 'addict-96',
      'adjust-26.9']
+
+-------
+Classes
+-------
 
 The `classids()` method may also be used to retrieve the classes that
 a given lemma belongs to:
@@ -52,6 +64,10 @@ list of thematic roles for a given VerbNet class:
     Experiencer [+animate]
     Predicate
 
+---------------
+Pretty-printing
+---------------
+
 The VerbNet corpus also provides a variety of pretty printing
 functions that can be used to display the xml contents in a more
 consise form.  The simplest such method is `pprint()`:
@@ -78,8 +94,9 @@ consise form.  The simplest such method is `pprint()`:
           Semantics:
             * weather(during(E), Weather_type, Theme)
 
-VerbNet Corpus Reader
-=====================
+------------------------
+Regression tests
+------------------------
 
 Make sure we're picking up the right number of elements:
 
@@ -142,4 +159,3 @@ longid() and shortid() can be used to convert identifiers:
     Traceback (most recent call last):
       . . .
     ValueError: vnclass identifier 'badidentifier' not found
-
