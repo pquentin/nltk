@@ -139,7 +139,7 @@ fileids() can be used to get files based on VerbNet class ids:
     >>> verbnet.fileids('badidentifier')
     Traceback (most recent call last):
       . . .
-    ValueError: vnclass identifier 'badidentifier' not found
+    VerbNetError: vnclass identifier 'badidentifier' not found
 
 longid() and shortid() can be used to convert identifiers:
 
@@ -154,8 +154,8 @@ longid() and shortid() can be used to convert identifiers:
     >>> verbnet.longid('badidentifier')
     Traceback (most recent call last):
       . . .
-    ValueError: vnclass identifier 'badidentifier' not found
+    VerbNetError: vnclass identifier 'badidentifier' not found
     >>> verbnet.shortid('badidentifier')
     Traceback (most recent call last):
       . . .
-    ValueError: vnclass identifier 'badidentifier' not found
+    VerbNetError: vnclass identifier 'badidentifier' not found

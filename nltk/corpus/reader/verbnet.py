@@ -21,6 +21,10 @@ from nltk import compat
 from nltk.corpus.reader.xmldocs import XMLCorpusReader
 
 
+class VerbNetError(Exception):
+    """An exception class for wordnet-related errors."""
+
+
 class VerbnetCorpusReader(XMLCorpusReader):
 
     # No unicode encoding param, since the data files are all XML.
@@ -98,8 +102,8 @@ class VerbnetCorpusReader(XMLCorpusReader):
         """
         if len([x for x in [lemma, wordnetid, fileid, classid]
                 if x is not None]) > 1:
-            raise ValueError('Specify at most one of: fileid, wordnetid, '
-                             'fileid, classid')
+            raise VerbNetError('Specify at most one of: fileid, '
+                               'wordnetid, fileid, classid')
         if fileid is not None:
             return [c for (c, f) in self._class_to_fileid.items()
                     if f == fileid]
@@ -140,11 +144,8 @@ class VerbnetCorpusReader(XMLCorpusReader):
                 for subclass in tree.findall('.//VNSUBCLASS'):
                     if classid == subclass.get('ID'):
                         return subclass
-                else:
-                    assert False  # we saw it during _index()!
 
-        else:
-            raise ValueError('Unknown identifier %s' % fileid_or_classid)
+        raise VerbNetError('Unknown identifier %s' % fileid_or_classid)
 
     def fileids(self, vnclass_ids=None):
         """
@@ -226,11 +227,11 @@ class VerbnetCorpusReader(XMLCorpusReader):
         if self._LONGID_RE.match(shortid):
             return shortid  # it's already a longid.
         elif not self._SHORTID_RE.match(shortid):
-            raise ValueError('vnclass identifier %r not found' % shortid)
+            raise VerbNetError('vnclass identifier %r not found' % shortid)
         try:
             return self._shortid_to_longid[shortid]
         except KeyError:
-            raise ValueError('vnclass identifier %r not found' % shortid)
+            raise VerbNetError('vnclass identifier %r not found' % shortid)
 
     def shortid(self, longid):
         """Given a long VerbNet class identifier (eg 'confess-37.10'),
@@ -242,7 +243,7 @@ class VerbnetCorpusReader(XMLCorpusReader):
         if m:
             return m.group(2)
         else:
-            raise ValueError('vnclass identifier %r not found' % longid)
+            raise VerbNetError('vnclass identifier %r not found' % longid)
 
     #
     # Pretty Printing
