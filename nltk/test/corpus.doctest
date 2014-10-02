@@ -866,26 +866,28 @@ retrieved with the following methods:
 
     >>> from nltk.corpus import verbnet
     >>> verbnet.lemmas()[20:25]
-    ['accelerate', 'accept', 'acclaim', 'accompany', 'accrue']
+    ['abut', 'accede', 'accelerate', 'accept', 'acclaim']
     >>> verbnet.classids()[:5]
-    ['accompany-51.7', 'admire-31.2', 'admire-31.2-1', 'admit-65', 'adopt-93']
+    ['accept-77', 'accompany-51.7', 'acquiesce-95', 'addict-96',
+     'adjust-26.9']
 
 The `classids()` method may also be used to retrieve the classes that
 a given lemma belongs to:
 
     >>> verbnet.classids('accept')
-    ['approve-77', 'characterize-29.2-1-1', 'obtain-13.5.2']
+    ['accept-77', 'approve-77', 'characterize-29.2-1-1',
+     'obtain-13.5.2']
 
 The primary object in the lexicon is a class record, which is stored
 as an ElementTree xml object.  The class record for a given class
 identifier is returned by the `vnclass()` method:
 
-    >>> verbnet.vnclass('remove-10.1') # doctest: +ELLIPSIS
+    >>> verbnet.vnclass('remove-10.1')
     <Element 'VNCLASS' at ...>
 
 The `vnclass()` method also accepts "short" identifiers, such as '10.1':
 
-    >>> verbnet.vnclass('10.1') # doctest: +ELLIPSIS
+    >>> verbnet.vnclass('10.1')
     <Element 'VNCLASS' at ...>
 
 See the VerbNet documentation, or the VerbNet files, for information
@@ -1633,17 +1635,18 @@ Make sure we're picking up the right number of elements:
 
     >>> from nltk.corpus import verbnet
     >>> len(verbnet.lemmas())
-    3621
+    3907
     >>> len(verbnet.wordnetids())
-    4953
+    5317
     >>> len(verbnet.classids())
-    429
+    484
 
 Selecting classids based on various selectors:
 
-    >>> verbnet.classids(lemma='take') # doctest: +NORMALIZE_WHITESPACE
+    >>> verbnet.classids(lemma='take')
     ['bring-11.3', 'characterize-29.2', 'convert-26.6.2', 'cost-54.2',
-    'fit-54.3', 'performance-26.7-2', 'steal-10.5']
+     'fit-54.3', 'hire-13.5.3', 'performance-26.7-2', 'require-103',
+     'steal-10.5']
     >>> verbnet.classids(wordnetid='lead%2:38:01')
     ['accompany-51.7']
     >>> verbnet.classids(fileid='approve-77.xml')
