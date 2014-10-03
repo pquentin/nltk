@@ -64,6 +64,23 @@ list of thematic roles for a given VerbNet class:
     Experiencer [+animate]
     Predicate
 
+------
+Frames
+------
+
+In VerbNet, if a verb is in subclass X-Y-Z, all frames from
+superclasses X and Y also apply. `frames` returns all those frames,
+not only those of the current class Z.
+
+    >>> learn_frames = verbnet.frames('learn-14-2-1')
+    >>> for frame in learn_frames:
+    ...     print(frame.find('DESCRIPTION').get('primary'))
+    NP V NP PP.source
+    NP V PP.source
+    NP V NP
+    NP V that S
+    NP V PP.topic
+
 ---------------
 Pretty-printing
 ---------------

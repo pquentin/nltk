@@ -147,6 +147,31 @@ class VerbnetCorpusReader(XMLCorpusReader):
 
         raise VerbNetError('Unknown identifier %s' % fileid_or_classid)
 
+    def frames(self, classid):
+        """
+        Return XML for all frames valid for that class ID.
+
+        In VerbNet, if a verb is in subclass X-Y-Z, all frames from
+        superclasses X and Y also apply. This method returns all those
+        frames, not only those of the current class Z.
+        """
+
+        all_frames = []
+        classid = self.longid(classid)
+        if not classid in self._class_to_fileid:
+            return VerbNetError('Unknown identifier %s' % classid)
+
+        fileid = self._class_to_fileid[self.longid(classid)]
+        tree = self.xml(fileid)
+        if tree.get('ID').startswith(classid):
+            all_frames.extend(tree.findall('FRAMES/FRAME'))
+
+        for subclass in tree.findall('.//VNSUBCLASS'):
+            if subclass.get('ID').startswith(classid):
+                all_frames.extend(subclass.findall('FRAMES/FRAME'))
+
+        return all_frames
+
     def fileids(self, vnclass_ids=None):
         """
         Return a list of fileids that make up this corpus.  If
