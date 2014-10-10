@@ -147,7 +147,7 @@ class VerbnetCorpusReader(XMLCorpusReader):
 
         raise VerbNetError('Unknown identifier %s' % fileid_or_classid)
 
-    def frames(self, classid):
+    def frames(self, shortclassid):
         """
         Return XML for all frames valid for that class ID.
 
@@ -156,21 +156,34 @@ class VerbnetCorpusReader(XMLCorpusReader):
         frames, not only those of the current class Z.
         """
 
-        all_frames = []
-        classid = self.longid(classid)
+        def merge_themroles(parent_themroles, child_themroles):
+            for themrole in child_themroles:
+                corresponding_parent_role = parent_themroles.find("THEMROLE[@type='{}']".format(themrole.get('type')))
+                if corresponding_parent_role is not None:
+                    parent_themroles.remove(corresponding_parent_role)
+                    parent_themroles.append(themrole)
+
+            return parent_themroles
+
+        def all_frames_aux(wanted_id, vnclass, themroles):
+            if wanted_id.startswith(vnclass.get('ID')):
+                for frame in vnclass.findall('FRAMES/FRAME'):
+                    yield frame, themroles
+
+            for vnsubclass in vnclass.findall('SUBCLASSES/VNSUBCLASS'):
+                subthemroles = merge_themroles(themroles, vnsubclass.find('THEMROLES'))
+                for frame, themroles in all_frames_aux(wanted_id, vnsubclass, subthemroles):
+                    yield frame, themroles
+
+        classid = self.longid(shortclassid)
         if not classid in self._class_to_fileid:
             return VerbNetError('Unknown identifier %s' % classid)
 
         fileid = self._class_to_fileid[self.longid(classid)]
-        tree = self.xml(fileid)
-        if tree.get('ID').startswith(classid):
-            all_frames.extend(tree.findall('FRAMES/FRAME'))
-
-        for subclass in tree.findall('.//VNSUBCLASS'):
-            if subclass.get('ID').startswith(classid):
-                all_frames.extend(subclass.findall('FRAMES/FRAME'))
-
-        return all_frames
+        vnclass = self.xml(fileid)
+        # In Python 3.4, `yield from` would have been enough
+        for frame, themroles in all_frames_aux(shortclassid, vnclass, vnclass.find('THEMROLES')):
+            yield {'frame': frame, 'themroles': themroles}
 
     def fileids(self, vnclass_ids=None):
         """
