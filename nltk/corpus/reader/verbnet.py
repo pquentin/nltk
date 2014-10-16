@@ -147,7 +147,7 @@ class VerbnetCorpusReader(XMLCorpusReader):
 
         raise VerbNetError('Unknown identifier %s' % fileid_or_classid)
 
-    def frames(self, shortclassid):
+    def frames(self, shortclassid, include_superclasses=False):
         """
         Return XML for all frames valid for that class ID.
 
@@ -166,7 +166,12 @@ class VerbnetCorpusReader(XMLCorpusReader):
             return parent_themroles
 
         def all_frames_aux(wanted_id, vnclass, themroles):
-            if wanted_id.startswith(vnclass.get('ID')):
+            if include_superclasses:
+                include_this_class = wanted_id.startswith(vnclass.get('ID'))
+            else:
+                include_this_class = wanted_id == vnclass.get('ID')
+
+            if include_this_class:
                 for frame in vnclass.findall('FRAMES/FRAME'):
                     yield frame, themroles
 
@@ -184,6 +189,12 @@ class VerbnetCorpusReader(XMLCorpusReader):
         # In Python 3.4, `yield from` would have been enough
         for frame, themroles in all_frames_aux(shortclassid, vnclass, vnclass.find('THEMROLES')):
             yield {'frame': frame, 'themroles': themroles}
+
+    def frames_for_lemma(self, lemma):
+        for classid in self.classids(lemma):
+            for frame in self.frames(classid, include_superclasses=True):
+                frame['classid'] = classid
+                yield frame
 
     def fileids(self, vnclass_ids=None):
         """
