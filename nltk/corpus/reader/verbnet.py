@@ -49,7 +49,7 @@ class VerbnetCorpusReader(XMLCorpusReader):
         # Initialize the dictionaries.  Use the quick (regexp-based)
         # method instead of the slow (xml-based) method, because it
         # runs 2-30 times faster.
-        self._quick_index()
+        self._index()
 
     _LONGID_RE = re.compile(r'([^\-\.]*)-([\d+.\-]+)$')
     """Regular expression that matches (and decomposes) longids"""
