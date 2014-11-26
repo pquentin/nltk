@@ -16,6 +16,7 @@ from __future__ import unicode_literals
 import re
 import textwrap
 from collections import defaultdict
+from xml.etree import ElementTree as ET
 
 from nltk import compat
 from nltk.corpus.reader.xmldocs import XMLCorpusReader
@@ -158,6 +159,67 @@ class VerbnetCorpusReader(XMLCorpusReader):
         frames, not only those of the current class Z.
         """
 
+        def powerset(iterable):
+            from itertools import chain, combinations
+            "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
+            s = list(iterable)
+            return chain.from_iterable(combinations(s, r) for r in range(len(s)+1))
+
+        def powerset_permutations(iterable):
+            from itertools import permutations
+            for part in powerset(iterable):
+                for reorder in permutations(part):
+                    yield reorder
+
+        def get_before_verb_and_verb(syntax):
+            for part in syntax:
+                yield part
+                if part.tag == 'VERB':
+                    break
+
+        def get_frame_objects(syntax):
+            """Return all frames objects after the verb, grouped by phrases"""
+            i = 0
+            verb_found = False
+            while i < len(syntax):
+                if syntax[i].tag == 'VERB':
+                    verb_found = True
+                elif verb_found:
+                    if syntax[i].tag == 'PREP' and i+1 < len(syntax) and syntax[i+1].tag == 'NP':
+                        yield (syntax[i], syntax[i+1])
+                        i += 1
+                    else:
+                        yield (syntax[i],)
+
+                i += 1
+
+        def flatten_objects(objs):
+            """Due to get_frame_objects, some objects were in tuple, others
+            not. Flatten all of this."""
+            for part in objs:
+                if type(part) == tuple:
+                    for tp in part:
+                        yield tp
+                else:
+                    yield tp
+
+        def expanded_frame(frame):
+            syntax = frame.find('SYNTAX')
+            frame_subject_and_verb = list(get_before_verb_and_verb(syntax))
+
+            for frame_object_option in powerset_permutations(get_frame_objects(syntax)):
+                import copy
+                next_frame = copy.deepcopy(frame)
+                next_frame.remove(next_frame.find('DESCRIPTION')) # description could be wrong
+                next_frame.remove(next_frame.find('SYNTAX')) # syntax will change
+
+                next_syntax = ET.Element('SYNTAX')
+                for c in frame_subject_and_verb + list(flatten_objects(frame_object_option)):
+                    next_syntax.append(c)
+
+                next_frame.append(next_syntax)
+                yield next_frame
+
         def merge_themroles(parent_themroles, child_themroles):
             for themrole in child_themroles:
                 corresponding_parent_role = parent_themroles.find("THEMROLE[@type='{}']".format(themrole.get('type')))
@@ -175,10 +237,15 @@ class VerbnetCorpusReader(XMLCorpusReader):
 
             if include_this_class:
                 for frame in vnclass.findall('FRAMES/FRAME'):
-                    yield frame, themroles
+                    if self.expand_substructures:
+                        for ex_frame in expanded_frame(frame):
+                            yield ex_frame, themroles
+                    else:
+                        yield frame, themroles
 
             for vnsubclass in vnclass.findall('SUBCLASSES/VNSUBCLASS'):
                 subthemroles = merge_themroles(themroles, vnsubclass.find('THEMROLES'))
+                # In Python 3.4, `yield from` would have been enough
                 for frame, themroles in all_frames_aux(wanted_id, vnsubclass, subthemroles):
                     yield frame, themroles
 
