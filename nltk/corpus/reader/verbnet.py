@@ -31,6 +31,8 @@ class VerbnetCorpusReader(XMLCorpusReader):
     def __init__(self, root, fileids, wrap_etree=False):
         XMLCorpusReader.__init__(self, root, fileids, wrap_etree)
 
+        self.expand_substructures = 'verbenet' in root
+
         self._lemma_to_class = defaultdict(list)
         """A dictionary mapping from verb lemma strings to lists of
         VerbNet class identifiers."""
